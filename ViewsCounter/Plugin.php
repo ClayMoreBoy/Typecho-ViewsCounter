@@ -4,9 +4,9 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
  * 文章浏览量统计插件，可设置对同一篇文章的多次浏览行为是否计入浏览量的时间间隔。
  *
  * @package ViewsCounter
- * @author  Huspy
- * @version 0.1.0
- * @link https://www.mierhuo.com
+ * @author  Quarkay
+ * @version 1.0.0
+ * @link https://www.quarkay.com
  */
 class ViewsCounter_Plugin implements Typecho_Plugin_Interface
 {
@@ -85,14 +85,20 @@ class ViewsCounter_Plugin implements Typecho_Plugin_Interface
      * 执行统计过程
      *
      * @access public
+     * @param Widget_Archive $archive_obj
      * @return void
      * @throws  Typecho_Exception
      */
-    public static function count()
+    public static function count($archive_obj)
     {
+        // 若已登录不执行统计操作
+        if (Typecho_Widget::widget('Widget_User')->hasLogin()) {
+            return;
+        }
+        
         // 仅对文章进行统计
-        if (Typecho_Widget::widget('Widget_Archive')->is('single')) {
-            $cid = Typecho_Widget::widget('Widget_Archive')->cid;
+        if ($archive_obj->is('single')) {
+            $cid = $archive_obj->cid;
             $key = '__viewsCounter';
             $cids = Typecho_Cookie::get($key);
             $cookie_time = Typecho_Widget::widget('Widget_Options')
